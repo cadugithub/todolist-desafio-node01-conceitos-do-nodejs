@@ -9,33 +9,53 @@ app.use(cors());
 app.use(express.json());
 const users = [];
 
-function checksExistsUserAccount(request, response, next) {
+function checksExistsUserAccountWithUsername(request, response, next) {
   const {username} = request.headers
 
-  const user = users.find(user => users.username === username)
-
+  const user = users.find(user => user.username === username)
+  console.log(username)
   if(user){
-    return response.status(400).json({error: "already exist user with this username "})
+    return response.status(400).json({error: "already exist user with this username"})
   }
   request.user = user
 
   return next()
 }
 
-app.post('/users', checksExistsUserAccount,(request, response) => {
+function checksExistsUserAccount(request, response, next){
+  const {username} = request.headers
+
+  const user = users.find(user => user.username === username)
+  console.log(username)
+  if(!user){
+    return response.status(400).json({error: "user not found"})
+  }
+  request.user = user
+
+  return next()
+}
+
+
+app.post('/users', checksExistsUserAccountWithUsername,(request, response) => {
   const {name, username} = request.body
 
   users.push({
     id: uuidv4,
     name,
     username,
-    todos:[]
+    todos:["Minhas atividades"]
   })
   return response.json(users[0])
 });
 
-app.get('/todos', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+app.get('/todos', (request, response) => {
+  const {username} = request.headers
+
+  const user = users.find(user => user.username === username)
+  console.log(user)
+  const todo = user.todos
+  
+  return response.json(todo)
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
