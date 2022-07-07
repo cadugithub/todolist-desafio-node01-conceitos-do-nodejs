@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const { v4: uuidv4 } = require('uuid');
+const { query } = require('express');
 
 const app = express();
 
@@ -27,7 +28,7 @@ function checksExistsUserAccount(request, response, next){
 
 app.post('/users',(request, response) => {
   const {name, username} = request.body
-
+  
   const userExist = users.find(user => user.username === username)
 
   if(userExist){
@@ -43,6 +44,11 @@ app.post('/users',(request, response) => {
   return response.json(users)
 });
 
+function searchTodo(todos, idTodo){
+  const todo = todos.find(todo => todo.id === idTodo)
+  
+  return todo
+}
 app.get('/todos',checksExistsUserAccount, checksExistsUserAccount,(request, response) => {
   
   const {user} = request
@@ -65,11 +71,6 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
   return response.json(user.todos)
 });
 
-function searchTodo(todos, id){
-  const todo = todos.find(todo => todo.id === id)
-  
-  return todo
-}
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const {id} = request.query
   const {user} = request
@@ -112,7 +113,12 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  
+  const {id} = request.query
+  const {user} = request
+
+  const updatedTodos = user.todos.filter(todo => todo.id !== id)
+  user.todos = updatedTodos
+  return response.json(user.todos)
 });
 
 module.exports = app;
