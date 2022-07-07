@@ -41,7 +41,12 @@ app.post('/users',(request, response) => {
     username,
     todos:[]
   })
-  return response.json(users)
+  return response.status(201).json({
+    id: uuidv4(),
+    name,
+    username,
+    todos:[]
+  })
 });
 
 function searchTodo(todos, idTodo){
