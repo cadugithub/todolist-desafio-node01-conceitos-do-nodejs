@@ -65,11 +65,20 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
   return response.json(user.todos)
 });
 
+function searchTodo(todos, id){
+  const todo = todos.find(todo => todo.id === id)
+  
+  return todo
+}
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const {id} = request.query
   const {user} = request
   const {title, deadline} = request.body
-  const todo = user.todos.find(todo => todo.id === id)
+  const todo = searchTodo(user.todos, id)
+
+  if (!todo){
+    return response.status(400).json({"error": "não há todo"})
+  }
 
   todo.title = title
   todo.deadline = new Date(deadline)
@@ -84,11 +93,26 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const {id} = request.query
+  const {user} = request
+  const todo = searchTodo(user.todos, id)
+
+  if (!todo){
+    return response.status(400).json({"error": "não há todo com esse código"})
+  }
+  todo.done = true
+
+  user.todos.forEach(element => {
+    if(element.id === id){
+     element = todo
+    }
+   });
+
+  return response.json(user.todos)
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  
 });
 
 module.exports = app;
