@@ -73,7 +73,13 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
     done: false
   })
 
-  return response.json(user.todos)
+  return response.status(201).json({
+    id: uuidv4(),
+    title,
+    deadline: new Date(deadline),
+    creat_at: new Date(),
+    done: false
+  })
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
@@ -83,7 +89,7 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const todo = searchTodo(user.todos, id)
 
   if (!todo){
-    return response.status(400).json({"error": "não há todo"})
+    return response.status(404).json({"error": "todo not found"})
   }
 
   todo.title = title
@@ -104,7 +110,7 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   const todo = searchTodo(user.todos, id)
 
   if (!todo){
-    return response.status(400).json({"error": "não há todo com esse código"})
+    return response.status(404).json({"error": "todo not found"})
   }
   todo.done = true
 
@@ -121,9 +127,13 @@ app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
   const {id} = request.query
   const {user} = request
 
+  if(!searchTodo(user.todos, id)){
+    return response.status(404).json({"error": "todo not found"})
+  }
   const updatedTodos = user.todos.filter(todo => todo.id !== id)
   user.todos = updatedTodos
-  return response.json(user.todos)
+  
+  return response.status(204)
 });
 
 module.exports = app;
