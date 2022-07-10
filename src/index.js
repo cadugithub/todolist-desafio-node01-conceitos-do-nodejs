@@ -27,7 +27,7 @@ function checksExistsUserAccount(request, response, next){
 
 function searchTodo(todos, idTodo){
   const todoFinded = todos.find(todo => todo.id === idTodo)
-  console.log("console log do searchTodo "+ todoFinded)
+  
   return todoFinded
 }
 
@@ -45,9 +45,9 @@ app.post('/users', (request, response) => {
   }
 
   users.push(newUser)
-  const user = users.filter(item => item.username === username)
+  
 
-  return response.status(201).json(user)
+  return response.status(201).json(newUser)
 });
 
 
