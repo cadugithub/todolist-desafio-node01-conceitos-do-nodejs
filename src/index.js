@@ -79,6 +79,12 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const {title, deadline} = request.body
   const todo = searchTodo(user.todos, id)
 
+  
+  if (!todo){
+    return response.status(404).json({"error": "todo not found"})
+  }
+  
+
   todo.title = title
   todo.deadline = new Date(deadline)
   
